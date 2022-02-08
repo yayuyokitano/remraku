@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  rem:
+    build: .
+    depends_on:
+      - go
+      - redis
+    command: go run main.go
+  
+  go:
+    image: golang
+  
+  redis:
+    image: redis

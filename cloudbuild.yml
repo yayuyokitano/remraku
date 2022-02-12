@@ -4,4 +4,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'us-central1-docker.pkg.dev/rem-970606/remraku/main']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  args: ['bash', 'restartinstance.sh']
+  args: ['gcloud', 'compute', 'instances', 'stop', 'remraku', '--zone', 'us-central1-c']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args: ['gcloud', 'compute', 'instances', 'start', 'remraku', '--zone', 'us-central1-c']

@@ -77,7 +77,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "remraku!test" {
 		if userHasPosted {
-			s.ChannelMessageSend(m.ChannelID, "spammer! (but CD works)")
+			s.ChannelMessageSend(m.ChannelID, "spammer! (but we do make CD work)")
 		} else {
 			s.ChannelMessageSend(m.ChannelID, "hi!")
 		}

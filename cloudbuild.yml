@@ -1,5 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['bash', 'dockerpush.sh']
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/rem-970606/remraku/main', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/rem-970606/remraku/main']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args: ['bash', 'restartinstance.sh']

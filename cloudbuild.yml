@@ -2,6 +2,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'us-central1-docker.pkg.dev/rem-970606/remraku/main', '.']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  args: ['compute', 'instances', 'stop', 'remraku']
+  args: ['gcloud', 'compute', 'instances', 'stop', 'remraku']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  args: ['compute', 'instances', 'start', 'remraku']
+  args: ['gcloud', 'compute', 'instances', 'start', 'remraku']

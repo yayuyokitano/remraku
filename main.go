@@ -15,6 +15,8 @@ import (
 
 func main() {
 
+	fmt.Fprintln(os.Stderr, "hello world")
+
 	token, err := getToken()
 	if err != nil {
 		fmt.Println("error getting Discord token,", err)
@@ -75,7 +77,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "remraku!test" {
 		if userHasPosted {
-			s.ChannelMessageSend(m.ChannelID, "spammer!")
+			s.ChannelMessageSend(m.ChannelID, "spammer! (but the CD works)")
 		} else {
 			s.ChannelMessageSend(m.ChannelID, "hi!")
 		}

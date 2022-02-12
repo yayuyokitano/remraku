@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/secretmanager v1.1.0
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/go-redis/redis v6.15.9+incompatible
-	google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44
+	google.golang.org/genproto v0.0.0-20220211171837-173942840c17
 )
 
 require (
@@ -28,6 +28,6 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/api v0.66.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.40.1 // indirect
+	google.golang.org/grpc v1.44.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )

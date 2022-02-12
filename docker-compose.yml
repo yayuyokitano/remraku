@@ -4,6 +4,8 @@ services:
     build: .
     depends_on:
       - redis
+    image: us-central1-docker.pkg.dev/rem-970606/remraku/main
+    platform: linux/amd64
   
   redis:
-    image: redis
+    image: redis:alpine

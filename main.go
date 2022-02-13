@@ -3,24 +3,28 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/errorreporting"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/bwmarrin/discordgo"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
-func main() {
+var errorClient *errorreporting.Client
+var datastoreClient *datastore.Client
 
-	fmt.Fprintln(os.Stderr, "hello world")
+func main() {
 
 	token, err := getToken()
 	if err != nil {
 		fmt.Println("error getting Discord token,", err)
-		time.Sleep(time.Second * 60)
+		time.Sleep(time.Second * 10)
 		main()
 		return
 	}
@@ -28,7 +32,7 @@ func main() {
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
-		time.Sleep(time.Second * 60)
+		time.Sleep(time.Second * 10)
 		main()
 		return
 	}
@@ -38,12 +42,33 @@ func main() {
 	err = dg.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
-		time.Sleep(time.Second * 60)
+		time.Sleep(time.Second * 10)
 		main()
 		return
 	}
-
 	defer dg.Close()
+
+	ctx := context.Background()
+	errorClient, err = errorreporting.NewClient(ctx, GCP_PROJECT_ID, errorreporting.Config{
+		ServiceName: "remraku",
+		OnError: func(err error) {
+			log.Printf("Could not log error: %v", err)
+		},
+	})
+	if err != nil {
+		fmt.Println("error creating log error client,", err)
+		time.Sleep(time.Second * 10)
+		main()
+		return
+	}
+	defer errorClient.Close()
+
+	datastoreClient, err = datastore.NewClient(ctx, GCP_PROJECT_ID)
+	if err != nil {
+		reportError(err)
+		return
+	}
+	defer datastoreClient.Close()
 
 	initRedis()
 
@@ -75,6 +100,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if !userHasPosted {
+		err = addXP(m.GuildID, m.Author.ID)
+	}
+
 	if m.Content == "remraku!test" {
 		if userHasPosted {
 			s.ChannelMessageSend(m.ChannelID, "spammer! (but CD is working!)")
@@ -93,7 +122,7 @@ func getToken() (string, error) {
 	defer client.Close()
 
 	req := &secretmanagerpb.AccessSecretVersionRequest{
-		Name: "projects/rem-970606/secrets/DISCORD_TOKEN/versions/latest",
+		Name: "projects/" + GCP_PROJECT_ID + "/secrets/DISCORD_TOKEN/versions/latest",
 	}
 	resp, err := client.AccessSecretVersion(ctx, req)
 	if err != nil {
@@ -102,4 +131,11 @@ func getToken() (string, error) {
 
 	return string(resp.Payload.Data), nil
 
+}
+
+func reportError(err error) {
+	errorClient.Report(errorreporting.Entry{
+		Error: err,
+	})
+	log.Print(err)
 }

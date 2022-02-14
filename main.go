@@ -23,6 +23,8 @@ var pool *pgxpool.Pool
 
 func main() {
 
+	ctx := context.Background()
+
 	token, err := getToken()
 	if err != nil {
 		fmt.Println("error getting Discord token,", err)
@@ -39,6 +41,18 @@ func main() {
 		return
 	}
 
+	databaseURL, err := getDatabaseURL()
+	if err != nil {
+		reportError(err)
+		return
+	}
+
+	pool, err = pgxpool.Connect(ctx, databaseURL)
+	if err != nil {
+		panic(err)
+	}
+	defer pool.Close()
+
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(guildCreate)
 	dg.AddHandler(guildDelete)
@@ -52,7 +66,6 @@ func main() {
 	}
 	defer dg.Close()
 
-	ctx := context.Background()
 	errorClient, err = errorreporting.NewClient(ctx, GCP_PROJECT_ID, errorreporting.Config{
 		ServiceName: "remraku",
 		OnError: func(err error) {
@@ -73,18 +86,6 @@ func main() {
 		return
 	}
 	defer datastoreClient.Close()
-
-	databaseURL, err := getDatabaseURL()
-	if err != nil {
-		reportError(err)
-		return
-	}
-
-	pool, err = pgxpool.Connect(ctx, databaseURL)
-	if err != nil {
-		panic(err)
-	}
-	defer pool.Close()
 
 	initRedis()
 

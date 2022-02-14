@@ -115,10 +115,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "pong!")
 	}
 
-	if m.Content == "remraku!crash" {
-		panic("test")
-	}
-
 	userHasPosted, err := checkUserHasPosted(m.Author.ID, m.GuildID)
 	if err != nil {
 		fmt.Println("error checking if user has posted:", err)

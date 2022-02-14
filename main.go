@@ -13,11 +13,13 @@ import (
 	"cloud.google.com/go/errorreporting"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/bwmarrin/discordgo"
+	"github.com/jackc/pgx/v4/pgxpool"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 var errorClient *errorreporting.Client
 var datastoreClient *datastore.Client
+var pool *pgxpool.Pool
 
 func main() {
 
@@ -38,6 +40,8 @@ func main() {
 	}
 
 	dg.AddHandler(messageCreate)
+	dg.AddHandler(guildCreate)
+	dg.AddHandler(guildDelete)
 
 	err = dg.Open()
 	if err != nil {
@@ -70,6 +74,18 @@ func main() {
 	}
 	defer datastoreClient.Close()
 
+	databaseURL, err := getDatabaseURL()
+	if err != nil {
+		reportError(err)
+		return
+	}
+
+	pool, err = pgxpool.Connect(ctx, databaseURL)
+	if err != nil {
+		panic(err)
+	}
+	defer pool.Close()
+
 	initRedis()
 
 	fmt.Println(".-------.        .-''-.  ,---.    ,---..-------.       ____    .--.   .--.    ___    _  ")
@@ -94,6 +110,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.Content == "remraku!ping" {
+		s.ChannelMessageSend(m.ChannelID, "pong!")
+	}
+
+	if m.Content == "remraku!crash" {
+		panic("test")
+	}
+
 	userHasPosted, err := checkUserHasPosted(m.Author.ID, m.GuildID)
 	if err != nil {
 		fmt.Println("error checking if user has posted:", err)
@@ -113,7 +137,28 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func getToken() (string, error) {
+func guildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
+	if g.Guild.Unavailable {
+		return
+	}
+
+	err := addGuild(g.Guild.ID)
+	if err != nil {
+		fmt.Println("error adding guild:", err)
+		return
+	}
+
+}
+
+func guildDelete(s *discordgo.Session, g *discordgo.GuildDelete) {
+	err := removeGuild(g.Guild.ID)
+	if err != nil {
+		fmt.Println("error removing guild:", err)
+		return
+	}
+}
+
+func getSecret(name string) (string, error) {
 	ctx := context.Background()
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
@@ -122,7 +167,7 @@ func getToken() (string, error) {
 	defer client.Close()
 
 	req := &secretmanagerpb.AccessSecretVersionRequest{
-		Name: "projects/" + GCP_PROJECT_ID + "/secrets/DISCORD_TOKEN/versions/latest",
+		Name: "projects/" + GCP_PROJECT_ID + "/secrets/" + name + "/versions/latest",
 	}
 	resp, err := client.AccessSecretVersion(ctx, req)
 	if err != nil {
@@ -130,7 +175,14 @@ func getToken() (string, error) {
 	}
 
 	return string(resp.Payload.Data), nil
+}
 
+func getToken() (string, error) {
+	return getSecret("DISCORD_TOKEN")
+}
+
+func getDatabaseURL() (string, error) {
+	return getSecret("DATABASE_URL")
 }
 
 func reportError(err error) {

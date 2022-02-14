@@ -1,11 +1,14 @@
 version: "3.9"
 services:
-  rem:
+  remraku:
     build: .
     depends_on:
       - redis
     image: us-central1-docker.pkg.dev/rem-970606/remraku/main
     platform: linux/amd64
+    deploy:
+      restart_policy:
+        condition: on-failure
   
   redis:
     image: redis:alpine

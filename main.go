@@ -183,7 +183,7 @@ func getToken() (string, error) {
 }
 
 func getDatabaseURL() (string, error) {
-	return getSecret("DATABASE_URL")
+	return getSecret("DATABASE_PRIVATE_URL")
 }
 
 func reportError(err error) {

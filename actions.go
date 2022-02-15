@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"math/rand"
-	"strconv"
 
 	"cloud.google.com/go/datastore"
 )
@@ -67,17 +66,12 @@ func addXP(serverID string, userID string) (err error) {
 
 func addGuild(guildID string) (err error) {
 	ctx := context.Background()
-	_, err = pool.Exec(ctx, "INSERT INTO guilds (guildID) VALUES ($1)", guildID)
+	_, err = pool.Exec(ctx, "INSERT INTO guilds (guildID) VALUES ($1::varchar(18))", guildID)
 	return
 }
 
-func removeGuild(guildIDStr string) (err error) {
-	guildID, err := strconv.ParseInt(guildIDStr, 10, 64)
-	if err != nil {
-		return
-	}
-
+func removeGuild(guildID string) (err error) {
 	ctx := context.Background()
-	_, err = pool.Exec(ctx, "DELETE FROM guilds WHERE guildID = $1", guildID)
+	_, err = pool.Exec(ctx, "DELETE FROM guilds WHERE guildID = $1::varchar(18)", guildID)
 	return
 }

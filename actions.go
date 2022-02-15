@@ -6,6 +6,7 @@ import (
 	"math/rand"
 
 	"cloud.google.com/go/datastore"
+	"github.com/jackc/pgtype"
 )
 
 type ServerXP map[string]int64
@@ -66,12 +67,16 @@ func addXP(serverID string, userID string) (err error) {
 
 func addGuild(guildID string) (err error) {
 	ctx := context.Background()
-	_, err = pool.Exec(ctx, "INSERT INTO guilds (guildID) VALUES ($1::varchar(18))", guildID)
+	guildIDVarchar := &pgtype.Varchar{}
+	guildIDVarchar.Set(guildID)
+	_, err = pool.Exec(ctx, "INSERT INTO guilds (guildID) VALUES ($1)", guildIDVarchar)
 	return
 }
 
 func removeGuild(guildID string) (err error) {
 	ctx := context.Background()
-	_, err = pool.Exec(ctx, "DELETE FROM guilds WHERE guildID = $1::varchar(18)", guildID)
+	guildIDVarchar := &pgtype.Varchar{}
+	guildIDVarchar.Set(guildID)
+	_, err = pool.Exec(ctx, "DELETE FROM guilds WHERE guildID = $1", guildIDVarchar)
 	return
 }

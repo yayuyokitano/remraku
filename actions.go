@@ -65,16 +65,10 @@ func addXP(serverID string, userID string) (err error) {
 	return
 }
 
-func addGuild(guildIDStr string) (err error) {
-	guildID, err := strconv.ParseInt(guildIDStr, 10, 64)
-	if err != nil {
-		return
-	}
-
+func addGuild(guildID string) (err error) {
 	ctx := context.Background()
 	_, err = pool.Exec(ctx, "INSERT INTO guilds (guildID) VALUES ($1)", guildID)
 	return
-
 }
 
 func removeGuild(guildIDStr string) (err error) {

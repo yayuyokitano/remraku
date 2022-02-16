@@ -46,7 +46,7 @@ func addXP(serverID string, userID string) (err error) {
 		}
 	}
 
-	toAdd := rand.Int63n(4) + 1
+	toAdd := rand.Int63n(11) + 15
 	serverXP[userID] += toAdd
 
 	_, err = tx.Put(datastore.NameKey("ServerXP", serverID, nil), &serverXP)

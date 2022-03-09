@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/errorreporting"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/bwmarrin/discordgo"
@@ -18,7 +17,6 @@ import (
 )
 
 var errorClient *errorreporting.Client
-var datastoreClient *datastore.Client
 var pool *pgxpool.Pool
 
 func main() {
@@ -79,13 +77,6 @@ func main() {
 		return
 	}
 	defer errorClient.Close()
-
-	datastoreClient, err = datastore.NewClient(ctx, GCP_PROJECT_ID)
-	if err != nil {
-		reportError(err)
-		return
-	}
-	defer datastoreClient.Close()
 
 	initRedis()
 

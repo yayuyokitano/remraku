@@ -51,10 +51,6 @@ func main() {
 	}
 	defer pool.Close()
 
-	dg.AddHandler(messageCreate)
-	dg.AddHandler(guildCreate)
-	dg.AddHandler(guildDelete)
-
 	err = dg.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
@@ -79,6 +75,10 @@ func main() {
 	defer errorClient.Close()
 
 	initRedis()
+
+	dg.AddHandler(messageCreate)
+	dg.AddHandler(guildCreate)
+	dg.AddHandler(guildDelete)
 
 	fmt.Println(".-------.        .-''-.  ,---.    ,---..-------.       ____    .--.   .--.    ___    _  ")
 	fmt.Println("|  _ _   \\     .'_ _   \\ |    \\  /    ||  _ _   \\    .'  __ `. |  | _/  /   .'   |  | | ")

@@ -115,6 +115,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if !userHasPosted {
 		err = addXP(m.GuildID, m.Author.ID)
 	}
+	if err != nil {
+		fmt.Println("error adding xp:", err)
+		return
+	}
 
 	if m.Content == "remraku!test" {
 		if userHasPosted {

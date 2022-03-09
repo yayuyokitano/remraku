@@ -7,7 +7,7 @@ import (
 
 func addXP(guildID string, userID string) (err error) {
 	toAdd := rand.Int63n(11) + 15
-	_, err = pool.Exec(context.Background(), "INSERT INTO guildXP (guildID, userID, xp) VALUES ($1, $2, $3) ON CONFLICT (xplookup) DO UPDATE SET xp = xp + $3", guildID, userID, toAdd)
+	_, err = pool.Exec(context.Background(), "INSERT INTO guildXP (guildID, userID, xp) VALUES ($1, $2, $3) ON CONFLICT (guildID, userID) DO UPDATE SET xp = guildXP.xp + EXCLUDED.xp", guildID, userID, toAdd)
 	return
 }
 

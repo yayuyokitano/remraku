@@ -6,6 +6,8 @@ services:
       - redis
     image: us-central1-docker.pkg.dev/rem-970606/remraku/main
     platform: linux/amd64
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud
     deploy:
       restart_policy:
         condition: on-failure

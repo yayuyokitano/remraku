@@ -5,7 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/errorreporting v0.1.0
 	cloud.google.com/go/secretmanager v1.3.0
-	github.com/bwmarrin/discordgo v0.23.2
+	github.com/bwmarrin/discordgo v0.24.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/jackc/pgx/v4 v4.15.0
 	google.golang.org/genproto v0.0.0-20220222213610-43724f9ea8cf
@@ -20,7 +20,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
-	github.com/gorilla/websocket v1.4.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.11.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

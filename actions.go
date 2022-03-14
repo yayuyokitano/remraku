@@ -5,9 +5,9 @@ import (
 	"math/rand"
 )
 
-func addXP(guildID string, userID string) (err error) {
+func addXP(guildID string, userID string, nickname string, avatar string) (err error) {
 	toAdd := rand.Int63n(11) + 15
-	_, err = pool.Exec(context.Background(), "INSERT INTO guildXP (guildID, userID, xp) VALUES ($1, $2, $3) ON CONFLICT (guildID, userID) DO UPDATE SET xp = guildXP.xp + EXCLUDED.xp", guildID, userID, toAdd)
+	_, err = pool.Exec(context.Background(), "INSERT INTO guildXP (guildID, userID, nickname, avatar, xp) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (guildID, userID) DO UPDATE SET xp = guildXP.xp + EXCLUDED.xp, nickname = EXCLUDED.nickname, avatar = EXCLUDED.avatar", guildID, userID, nickname, avatar, toAdd)
 	return
 }
 

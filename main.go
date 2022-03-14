@@ -97,6 +97,20 @@ func main() {
 	<-sc
 }
 
+func getName(m *discordgo.MessageCreate) string {
+	if m.Member.Nick == "" {
+		return m.Author.Username
+	}
+	return m.Member.Nick
+}
+
+func getAvatar(m *discordgo.MessageCreate) string {
+	if m.Member.Avatar != "" {
+		return m.Member.Avatar
+	}
+	return m.Author.Avatar
+}
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
 		return
@@ -113,7 +127,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if !userHasPosted {
-		err = addXP(m.GuildID, m.Author.ID)
+		err = addXP(m.GuildID, m.Author.ID, getName(m), getAvatar(m))
 	}
 	if err != nil {
 		fmt.Println("error adding xp:", err)

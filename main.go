@@ -151,15 +151,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "remraku!dump" && m.Author.ID == "196249128286552064" {
 		s.ChannelMessageSend(m.ChannelID, "dumping...")
-		iter := rdb.Scan(0, "prefix:*", 0).Iterator()
-		r := ""
-		for iter.Next() {
-			r += iter.Val() + "\n"
-		}
-		if err := iter.Err(); err != nil {
+		keys, err := rdb.Do("KEYS", "*").String()
+		if err != nil {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("error dumping redis: %v", err))
 		}
-		s.ChannelMessageSend(m.ChannelID, "```\n"+r+"\n```")
+		s.ChannelMessageSend(m.ChannelID, "```\n"+keys+"\n```")
 	}
 
 	if m.Content == "remraku!test" {

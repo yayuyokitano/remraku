@@ -218,9 +218,9 @@ func reportError(err error) {
 }
 
 type Blocked struct {
-	GuildID   string
-	ChannelID string
-	Xpgain    bool
+	GuildID   string `db:"guildid"`
+	ChannelID string `db:"channelid"`
+	Xpgain    bool   `db:"xpgain"`
 }
 
 func loadBlocklist() (err error) {

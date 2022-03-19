@@ -33,3 +33,27 @@ func checkUserHasPosted(userID string, serverID string) (bool, error) {
 	return false, nil
 
 }
+
+func modifyBlocklist(channelID string, listType string, state bool) (err error) {
+	if state {
+		status := rdb.Set(channelID+":"+listType, "1", 0)
+		err = status.Err()
+	} else {
+		status := rdb.Del(channelID + ":" + listType)
+		err = status.Err()
+	}
+	return
+}
+
+func checkBlocklist(channelID string, listType string) (bool, error) {
+	exists := rdb.Exists(channelID + ":" + listType)
+	if exists.Err() != nil {
+		return false, exists.Err()
+	}
+
+	if exists.Val() == 1 {
+		return true, nil
+	}
+
+	return false, nil
+}

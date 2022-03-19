@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/errorreporting v0.1.0
 	cloud.google.com/go/secretmanager v1.3.0
 	github.com/bwmarrin/discordgo v0.24.0
+	github.com/georgysavva/scany v0.3.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/jackc/pgx/v4 v4.15.0
 	google.golang.org/genproto v0.0.0-20220222213610-43724f9ea8cf

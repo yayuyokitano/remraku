@@ -12,6 +12,7 @@ import (
 	"cloud.google.com/go/errorreporting"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/bwmarrin/discordgo"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
@@ -126,7 +127,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if !userHasPosted {
+	xpBlocked, err := checkBlocklist(m.Author.ID, "xpgain")
+	if err != nil {
+		fmt.Println("error checking blocklist:", err)
+		return
+	}
+
+	if !userHasPosted && !xpBlocked {
 		err = addXP(m.GuildID, m.Author.ID, getName(m), getAvatar(m))
 	}
 	if err != nil {
@@ -135,6 +142,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Content == "remraku!test" {
+		if xpBlocked {
+			s.ChannelMessageSend(m.ChannelID, "blocklisted!")
+			return
+		}
 		if userHasPosted {
 			s.ChannelMessageSend(m.ChannelID, "spammer! (but CD is working!)")
 		} else {
@@ -196,4 +207,23 @@ func reportError(err error) {
 		Error: err,
 	})
 	log.Print(err)
+}
+
+type Blocked struct {
+	GuildID   string
+	ChannelID string
+	Xpgain    bool
+}
+
+func loadBlocklist() (err error) {
+	ctx := context.Background()
+	var blocklist []Blocked
+	err = pgxscan.Select(ctx, pool, &blocklist, "SELECT * FROM channelblocklist")
+	if err != nil {
+		return err
+	}
+	for _, channel := range blocklist {
+		modifyBlocklist(channel.GuildID, "xpgain", channel.Xpgain)
+	}
+	return
 }

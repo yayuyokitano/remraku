@@ -115,9 +115,7 @@ func setupPubsub(ctx context.Context) {
 	client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT_ID"))
 	if err != nil {
 		fmt.Println("error loading pubsub client: ", err)
-		time.Sleep(time.Second * 10)
-		main()
-		return
+		panic(err)
 	}
 	defer client.Close()
 
@@ -128,9 +126,6 @@ func setupPubsub(ctx context.Context) {
 	})
 	if err != nil {
 		fmt.Println("error receiving pubsub message: ", err)
-		time.Sleep(time.Second * 10)
-		main()
-		return
 	}
 }
 

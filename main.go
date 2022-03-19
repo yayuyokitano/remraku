@@ -104,7 +104,7 @@ func main() {
 
 	fmt.Println("Remraku is now running.  Press CTRL-C to exit.")
 
-	client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT_ID"))
+	client, err := pubsub.NewClient(ctx, GCP_PROJECT_ID)
 	if err != nil {
 		fmt.Println("error loading pubsub client: ", err)
 		panic(err)

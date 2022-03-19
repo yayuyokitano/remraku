@@ -149,6 +149,19 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.Content == "remraku!dump" && m.Author.ID == "196249128286552064" {
+		s.ChannelMessageSend(m.ChannelID, "dumping...")
+		iter := rdb.Scan(0, "prefix:*", 0).Iterator()
+		r := ""
+		for iter.Next() {
+			r += iter.Val() + "\n"
+		}
+		if err := iter.Err(); err != nil {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("error dumping redis: %v", err))
+		}
+		s.ChannelMessageSend(m.ChannelID, "```\n"+r+"\n```")
+	}
+
 	if m.Content == "remraku!test" {
 		if xpBlocked {
 			s.ChannelMessageSend(m.ChannelID, "blocklisted!")

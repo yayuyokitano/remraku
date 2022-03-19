@@ -49,6 +49,7 @@ func modifyBlocklist(channelID string, listType string, state bool) (err error) 
 }
 
 func checkBlocklist(channelID string, listType string) (bool, error) {
+	fmt.Println("Checking blocklist. " + channelID + ":" + listType)
 	exists := rdb.Exists(channelID + ":" + listType)
 	if exists.Err() != nil {
 		return false, exists.Err()

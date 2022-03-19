@@ -77,6 +77,14 @@ func main() {
 
 	initRedis()
 
+	err = loadBlocklist()
+	if err != nil {
+		fmt.Println("error loading blocklist:", err)
+		time.Sleep(time.Second * 10)
+		main()
+		return
+	}
+
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(guildCreate)
 	dg.AddHandler(guildDelete)

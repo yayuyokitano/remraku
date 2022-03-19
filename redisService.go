@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -36,9 +37,11 @@ func checkUserHasPosted(userID string, serverID string) (bool, error) {
 
 func modifyBlocklist(channelID string, listType string, state bool) (err error) {
 	if state {
+		fmt.Println("Adding to blocklist. " + channelID + ":" + listType)
 		status := rdb.Set(channelID+":"+listType, "1", 0)
 		err = status.Err()
 	} else {
+		fmt.Println("Removing from blocklist. " + channelID + ":" + listType)
 		status := rdb.Del(channelID + ":" + listType)
 		err = status.Err()
 	}

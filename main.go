@@ -230,7 +230,9 @@ func loadBlocklist() (err error) {
 	if err != nil {
 		return err
 	}
+	fmt.Println(blocklist)
 	for _, channel := range blocklist {
+		fmt.Println(channel)
 		modifyBlocklist(channel.GuildID, "xpgain", channel.Xpgain)
 	}
 	return

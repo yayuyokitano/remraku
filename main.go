@@ -135,7 +135,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	xpBlocked, err := checkBlocklist(m.Author.ID, "xpgain")
+	xpBlocked, err := checkBlocklist(m.ChannelID, "xpgain")
 	if err != nil {
 		fmt.Println("error checking blocklist:", err)
 		return

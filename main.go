@@ -156,10 +156,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if err != nil {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("error dumping redis: %v", err))
 		}
-		keySlice := keys.([]string)
 		r := ""
-		for _, key := range keySlice {
-			r += key + "\n"
+		for _, key := range keys.([]interface{}) {
+			r += key.(string) + "\n"
 		}
 
 		s.ChannelMessageSend(m.ChannelID, "```\n"+r+"\n```")

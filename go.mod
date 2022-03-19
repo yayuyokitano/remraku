@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/errorreporting v0.1.0
+	cloud.google.com/go/pubsub v1.3.1
 	cloud.google.com/go/secretmanager v1.3.0
 	github.com/bwmarrin/discordgo v0.24.0
 	github.com/georgysavva/scany v0.3.0
@@ -16,6 +17,7 @@ require (
 	cloud.google.com/go v0.100.2 // indirect
 	cloud.google.com/go/compute v1.3.0 // indirect
 	cloud.google.com/go/iam v0.1.0 // indirect
+	cloud.google.com/go/kms v1.4.0 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

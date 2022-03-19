@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +12,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/errorreporting"
+	"cloud.google.com/go/pubsub"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/bwmarrin/discordgo"
 	"github.com/georgysavva/scany/pgxscan"
@@ -100,6 +103,27 @@ func main() {
 	fmt.Println("''-'   `'-'     `'-..-'  '--'      '--'''-'   `'-'   '.(_,_).' `--'   `'-'    ``-'`-''  ")
 
 	fmt.Println("Remraku is now running.  Press CTRL-C to exit.")
+
+	client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT_ID"))
+	if err != nil {
+		fmt.Println("error loading pubsub client: ", err)
+		time.Sleep(time.Second * 10)
+		main()
+		return
+	}
+	defer client.Close()
+
+	sub := client.Subscription("remrakusub")
+	err = sub.Receive(ctx, func(_ context.Context, msg *pubsub.Message) {
+		fmt.Println("received message: ", string(msg.Data))
+		handlePubsub(msg)
+	})
+	if err != nil {
+		fmt.Println("error receiving pubsub message: ", err)
+		time.Sleep(time.Second * 10)
+		main()
+		return
+	}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
@@ -250,5 +274,25 @@ func loadBlocklist() (err error) {
 		fmt.Println(channel)
 		modifyBlocklist(channel.ChannelID, "xpgain", channel.Xpgain)
 	}
+	return
+}
+
+type blocklistMessage struct {
+	GuildID   string `json:"guildID"`
+	ChannelID string `json:"channelID"`
+	ListType  string `json:"listType"`
+	State     bool   `json:"state"`
+}
+
+func handlePubsub(msg *pubsub.Message) (state bool, err error) {
+	msg.Ack()
+	var m blocklistMessage
+	err = json.Unmarshal(msg.Data, &m)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("json.Unmarshal: %v", err))
+		return
+	}
+
+	modifyBlocklist(m.ChannelID, m.ListType, m.State)
 	return
 }

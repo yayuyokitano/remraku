@@ -104,14 +104,6 @@ func main() {
 
 	fmt.Println("Remraku is now running.  Press CTRL-C to exit.")
 
-	go setupPubsub(ctx)
-
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
-}
-
-func setupPubsub(ctx context.Context) {
 	client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT_ID"))
 	if err != nil {
 		fmt.Println("error loading pubsub client: ", err)
@@ -127,6 +119,10 @@ func setupPubsub(ctx context.Context) {
 	if err != nil {
 		fmt.Println("error receiving pubsub message: ", err)
 	}
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
 }
 
 func getName(m *discordgo.MessageCreate) string {
